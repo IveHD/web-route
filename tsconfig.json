@@ -1,0 +1,45 @@
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "module": "CommonJS",
+    "strict": true,
+    "noEmit": false,
+    "importHelpers": true,
+    "resolveJsonModule": true,
+    "moduleResolution": "node",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "preserveSymlinks": false,
+    "preserveWatchOutput": true,
+    "pretty": true,
+    "sourceMap": false,
+    "baseUrl": ".",
+    "outDir": "./dist",
+    "declaration": true,
+    "noImplicitAny": false,
+    "target": "es5",
+    "types": [
+      "node",
+    ],
+    "paths": {
+      "@/*": [
+        "src/*",
+      ],
+      "tslib": [
+        "node_modules/tslib/tslib.d.ts"
+      ]
+    },
+    "lib": [
+      "esnext",
+      "es2015.promise"
+    ]
+  },
+  "include": [
+    "src/**/*.ts",
+  ],
+  "exclude": [
+    "node_modules",
+  ]
+}
