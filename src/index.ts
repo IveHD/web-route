@@ -1,4 +1,4 @@
-import '../src/lib/moduleAlias';
+import './lib/moduleAlias';
 import {
   RequestMapping,
   ValidParam,
@@ -10,7 +10,7 @@ import { HTTP_METHOD } from './lib/const';
 import KoaRouter from 'koa-router';
 const router = new KoaRouter();
 
-function buildRoute(options: { cwd: string }) {
+function buildRoute(options: { cwd: string }): KoaRouter {
   const list = glob.sync(options.cwd);
   list.forEach(p => {
     require(p);
