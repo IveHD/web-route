@@ -16,11 +16,11 @@ npm install web-route --save
 // index.ts
 import Koa from 'koa';
 import path from 'path';
-import { buildRoute } from 'web-route';
+import { register } from 'web-route';
 
 const app = new Koa();
 
-const router = buildRoute({
+const router = register({
   cwd: path.resolve(__dirname, './controllers/*.ts')  // 设置 controller 文件 glob 路径
 });
 
@@ -67,10 +67,20 @@ curl --location --request GET 'http://localhost:8080/hi/sayHiAgain?a=hello' \
 
 
 # API
-### 初始化构建路由 buildRoute
+### 初始化构建路由 register
 ```typescript
-declare function buildRoute(options: {
+type RequestLogCallbackFn = (info: {
+  path: string;
+  method: string;
+  startTime: number;
+  endTime: number;
+  duration: number;
+  ctx: Context;
+}) => void;
+
+declare function register(options: {
     cwd: string;  // 设置 controller 文件 glob 路径，将用于识别 controller 模块。
+    requestLogCallback?: RequestLogCallbackFn;
 }): KoaRouter;
 ```
 

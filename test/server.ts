@@ -1,11 +1,14 @@
 import Koa from 'koa';
 import path from 'path';
-import { buildRoute } from '../src';
+import { register } from '../src';
 
 const app = new Koa();
 
-const router = buildRoute({
-  cwd: path.resolve(__dirname, './controllers/*.ts')  // 设置 controller 文件 glob 路径
+const router = register({
+  cwd: path.resolve(__dirname, './controllers/*.ts'),  // 设置 controller 文件 glob 路径
+  requestLogCallback(info) {
+    console.log(info.duration);
+  }
 });
 
 app.use(router.routes());

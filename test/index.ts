@@ -1,7 +1,7 @@
-import { buildRoute, getRouteData } from '../src';
+import { register, getRouteData } from '../src';
 import path from 'path';
 
-buildRoute({
+register({
   cwd: path.resolve(__dirname, './controllers/*.ts')  // controller 路径
 });
 
