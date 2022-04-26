@@ -1,8 +1,8 @@
 import { EXCEPTION_CODE } from '../lib/const';
-import { isPost } from '@/lib/util';
+import { isPost } from '../lib/util';
 import Koa from 'koa';
 import { Context } from 'koa';
-const bodyParser = require('@/lib/bodyParser');
+const bodyParser = require('../lib/bodyParser');
 
 type validFn = (paramName: string, paramValue: any, requestBody?: Record<string, any>, ctx?: Context) => string | boolean;
 

@@ -1,5 +1,3 @@
-import '../src/lib/moduleAlias';
-
 import { buildRoute, getRouteData } from '../src';
 import path from 'path';
 

@@ -1,15 +1,13 @@
-import './lib/moduleAlias';
 import {
   RequestMapping,
   ValidParam,
 } from './annotation';
 import glob from 'glob';
-import RouteMapping from '@/mapping/route';
+import RouteMapping from './mapping/route';
 import ValidParamRule from './validParamRule/index';
 import { HTTP_METHOD } from './lib/const';
 import KoaRouter from 'koa-router';
 const router = new KoaRouter();
-
 function buildRoute(options: { cwd: string }): KoaRouter {
   const list = glob.sync(options.cwd);
   list.forEach(p => {

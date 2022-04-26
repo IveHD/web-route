@@ -1,9 +1,9 @@
 
-import RouteMapping from '@/mapping/route';
-import { HTTP_METHOD } from '@/lib/const';
+import RouteMapping from '../mapping/route';
+import { HTTP_METHOD } from '../lib/const';
 import { EXCEPTION_CODE } from '../lib/const';
 import { setCorsHeader } from '../lib/cors';
-import { CORS } from '@/types/index';
+import { CORS } from '../types';
 
 type RouteConfig = string | {
   path: string;

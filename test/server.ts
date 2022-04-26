@@ -1,4 +1,3 @@
-import '../src/lib/moduleAlias';
 import Koa from 'koa';
 import path from 'path';
 import { buildRoute } from '../src';

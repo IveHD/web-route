@@ -24,9 +24,6 @@
       "node",
     ],
     "paths": {
-      "@/*": [
-        "src/*",
-      ],
       "tslib": [
         "node_modules/tslib/tslib.d.ts"
       ]

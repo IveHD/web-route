@@ -1,4 +1,4 @@
-import { RequestMapping } from "@/annotation";
+import { RequestMapping } from "../../src/annotation";
 
 @RequestMapping('/hello')
 class Hello {  

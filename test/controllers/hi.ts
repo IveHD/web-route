@@ -1,4 +1,4 @@
-import { RequestMapping, ValidParam, ValidParamRule } from "@/index";
+import { RequestMapping, ValidParam, ValidParamRule } from "../../src/index";
 import { Context } from "koa";
 
 @RequestMapping('/hi')

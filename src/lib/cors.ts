@@ -1,4 +1,4 @@
-import { CORS_CONFIG } from '@/types/index';
+import { CORS_CONFIG } from '../types/index';
 
 const corsDefaultHeader = {
   'origin': '*',
