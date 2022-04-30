@@ -5,8 +5,7 @@ import { register } from '../src';
 const app = new Koa();
 
 const router = register({
-  annControllerPath: path.resolve(__dirname, './controllers/*.ts'),  // 设置 controller 文件 glob 路径
-  controllerPath: path.resolve(__dirname, './controllers/*.js'),
+  controllerPath: path.resolve(__dirname, './controllers/*.ts'),  // 设置 controller 文件 glob 路径
   requestLogCallback(info) {
     console.log(info.duration);
   }

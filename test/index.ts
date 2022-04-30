@@ -2,7 +2,8 @@ import { register, getRouteData } from '../src';
 import path from 'path';
 
 register({
-  cwd: path.resolve(__dirname, './controllers/*.ts')  // controller 路径
+  annControllerPath: path.resolve(__dirname, './controllers/*.ts'),  // controller 路径
+  controllerPath: path.resolve(__dirname, './controllers/*.js'),  // 设置 controller 文件 glob 路径
 });
 
 const routeData = getRouteData();

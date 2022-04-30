@@ -8,6 +8,7 @@ import ValidParamRule from './validParamRule/index';
 import { HTTP_METHOD } from './lib/const';
 import KoaRouter from 'koa-router';
 import { Context } from 'koa';
+import { ROUTE } from 'src/types/global';
 const bodyParser = require('./lib/bodyParser');
 const router = new KoaRouter();
 const parser = bodyParser({});
@@ -21,14 +22,33 @@ type RequestLogCallbackFn = (info: {
   ctx: Context;
 }) => void;
 
-function register(options: { cwd: string, requestLogCallback?: RequestLogCallbackFn }): KoaRouter {
-  const list = glob.sync(options.cwd);
-  list.forEach(p => {
-    require(p);
-  });
-  const routeData = getRouteData();
+type Options = { annControllerPath?: string, controllerPath?: string; requestLogCallback?: RequestLogCallbackFn };
+
+function register(options: Options): KoaRouter {
+  let routeData: ROUTE[] = [];
+  const { annControllerPath, controllerPath } = options;
+  if (annControllerPath) {
+    const annList = glob.sync(options.annControllerPath);
+    annList.forEach(p => {
+      require(p);
+    });
+    Array.prototype.push.apply(routeData, getRouteData());
+  }
+  
+  if (controllerPath) {
+    const list =  glob.sync(options.controllerPath);
+    list.forEach(p => {
+      const controllers = require(p);
+      if (!Array.isArray(controllers)) throw new Error(`it is not a standard controller module for: ${p}`);
+      controllers.forEach(c => {
+        routeData.push(c);
+      });
+    })
+  }
+  
   routeData.forEach(r => {
-    router[r.method](r.path, ...r.handler);
+    const handler = Array.isArray(r.handler) ? r.handler : [r.handler];
+    router[r.method](r.path, ...handler);
     console.log(r.method, ':', r.path);
   });
 
