@@ -7,7 +7,7 @@ import RouteMapping from './mapping/route';
 import ValidParamRule from './validParamRule/index';
 import { HTTP_METHOD } from './lib/const';
 import KoaRouter from 'koa-router';
-import { Context } from 'koa';
+import { Context, Next } from 'koa';
 import { ROUTE } from 'src/types/global';
 const bodyParser = require('./lib/bodyParser');
 const router = new KoaRouter();
@@ -32,19 +32,20 @@ function register(options: Options): KoaRouter {
     annList.forEach(p => {
       require(p);
     });
-    Array.prototype.push.apply(routeData, getRouteData());
   }
   
   if (controllerPath) {
     const list =  glob.sync(options.controllerPath);
     list.forEach(p => {
       const controllers = require(p);
-      if (!Array.isArray(controllers)) throw new Error(`it is not a standard controller module for: ${p}`);
+      if (!Array.isArray(controllers)) throw new Error(`it is not a standard controller module of: ${p}`);
       controllers.forEach(c => {
-        routeData.push(c);
+        RouteMapping.addRoute(c);
       });
     })
   }
+
+  Array.prototype.push.apply(routeData, getRouteData());
   
   routeData.forEach(r => {
     const handler = Array.isArray(r.handler) ? r.handler : [r.handler];
@@ -70,7 +71,7 @@ function register(options: Options): KoaRouter {
       });
     }
     return result;
-  };
+  };;
   
   return router;
 }

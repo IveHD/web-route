@@ -1,7 +1,12 @@
 import path from 'path';
 import { GROUP_ROUTE, ROUTE, RouteConfig } from '../types/global';
-import { EXCEPTION_CODE } from '../lib/const';
+import { EXCEPTION_CODE, HTTP_METHOD } from '../lib/const';
 import { setCorsHeader } from '../lib/cors';
+
+const DEFAULT_CONFIG = {
+  method: HTTP_METHOD.GET,
+  cors: false,
+};
 
 class Mapping {
   map: Map<Function, GROUP_ROUTE> = new Map();
@@ -25,8 +30,8 @@ class Mapping {
   }
 
   addRoute(config: RouteConfig, ctor?: Function) {
-    const { path, method, handler } = config;
-    const addRoute = ctor ? this.doAddAnnotationRoute.bind(this, ctor) : this.doAddRoute;
+    const { path, method, handler } = Object.assign({}, DEFAULT_CONFIG, config);
+    const addRoute = ctor ? this.doAddAnnotationRoute.bind(this, ctor) : this.doAddRoute.bind(this);
     // 跨域设置
     const isCors = config.cors;
     if (isCors) {
