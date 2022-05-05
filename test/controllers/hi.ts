@@ -4,7 +4,7 @@ import { Context } from "koa";
 @RequestMapping('/hi')
 class HiController {
   
-  @RequestMapping({ path: '/sayHiAgain', method: 'post' })
+  @RequestMapping({ path: '/sayHiAgain', method: 'get' })
   @ValidParam({
     a: [ValidParamRule.REUQIRED, ValidParamRule.STRING],
     b: ValidParamRule.REUQIRED

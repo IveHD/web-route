@@ -2,11 +2,9 @@ import path from 'path';
 import { GROUP_ROUTE, ROUTE, RouteConfig } from '../types/global';
 import { EXCEPTION_CODE, HTTP_METHOD } from '../lib/const';
 import { setCorsHeader } from '../lib/cors';
+import { getConfig } from '../lib/config';
 
-const DEFAULT_CONFIG = {
-  method: HTTP_METHOD.GET,
-  cors: false,
-};
+const DEFAULT_CONFIG = getConfig();
 
 class Mapping {
   map: Map<Function, GROUP_ROUTE> = new Map();
@@ -26,21 +24,23 @@ class Mapping {
   }
 
   doAddRoute(route: ROUTE) {
+    if (this.routes.find(r => r.path === route.path && r.method === route.method)) {
+      throw new Error(`duplicate interface: ${route.method}: ${route.path}`);
+    }
     this.routes.push(route);
   }
 
   addRoute(config: RouteConfig, ctor?: Function) {
-    const { path, method, handler } = Object.assign({}, DEFAULT_CONFIG, config);
+    const { path, method, handler, cors, authValidate, isAuthValidate } = Object.assign({}, DEFAULT_CONFIG, config);
     const addRoute = ctor ? this.doAddAnnotationRoute.bind(this, ctor) : this.doAddRoute.bind(this);
-    // 跨域设置
-    const isCors = config.cors;
-    if (isCors) {
+    // 跨域预检请求
+    if (cors) {
       addRoute({
         path,
         method: 'options',
-        handler: (ctx, next) => {
+        handler: async (ctx, next) => {
           ctx.response.status = 200;
-          setCorsHeader(ctx, typeof config.cors === 'boolean' ? { methods: method } : Object.assign({ methods: method }, config.cors));
+          setCorsHeader(ctx, typeof cors === 'boolean' ? { methods: method } : Object.assign({ methods: method }, cors));
         }
       });
     }
@@ -48,6 +48,16 @@ class Mapping {
       path,
       method,
       handler: async (ctx, next) => {
+        if (isAuthValidate === true && typeof authValidate === 'function' && !await authValidate(ctx, next)) {
+          if (!ctx.body) {
+            ctx.body = {
+              success: false,
+              code: EXCEPTION_CODE.NO_AUTH.CODE,
+              info: EXCEPTION_CODE.NO_AUTH.INFO
+            };
+          }
+          return;
+        }
         if (typeof config !== 'string' && config.contentType && ctx.header['content-type'] !== config.contentType) {
           const EXCEPTION = EXCEPTION_CODE.UNSUPPORTED_CONTENT_TYPE
           ctx.body = {
@@ -57,8 +67,8 @@ class Mapping {
           };
           return;
         }
-        if (isCors) {
-          setCorsHeader(ctx, typeof config.cors === 'boolean' ? { methods: method } : Object.assign({ methods: method }, config.cors));
+        if (cors) {
+          setCorsHeader(ctx, typeof cors === 'boolean' ? { methods: method } : Object.assign({ methods: method }, cors));
         }
         await handler(ctx, next);
       },

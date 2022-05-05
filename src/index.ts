@@ -7,24 +7,16 @@ import RouteMapping from './mapping/route';
 import ValidParamRule from './validParamRule/index';
 import { HTTP_METHOD } from './lib/const';
 import KoaRouter from 'koa-router';
-import { Context, Next } from 'koa';
-import { ROUTE } from 'src/types/global';
+import { ROUTE, RegisterOptions } from './types/global';
+import { setConfig } from './lib/config';
 const bodyParser = require('./lib/bodyParser');
 const router = new KoaRouter();
 const parser = bodyParser({});
 
-type RequestLogCallbackFn = (info: {
-  path: string;
-  method: string;
-  startTime: number;
-  endTime: number;
-  duration: number;
-  ctx: Context;
-}) => void;
-
-type Options = { annControllerPath?: string, controllerPath?: string; requestLogCallback?: RequestLogCallbackFn };
-
-function register(options: Options): KoaRouter {
+function register(options: RegisterOptions): KoaRouter {
+  const { defaultConfig, authValidate } = options;
+  setConfig({...defaultConfig, authValidate});
+  
   let routeData: ROUTE[] = [];
   const { annControllerPath, controllerPath } = options;
   if (annControllerPath) {
@@ -42,7 +34,7 @@ function register(options: Options): KoaRouter {
       controllers.forEach(c => {
         RouteMapping.addRoute(c);
       });
-    })
+    });
   }
 
   Array.prototype.push.apply(routeData, getRouteData());
