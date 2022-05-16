@@ -6,12 +6,13 @@
 
 `暂时只支持 koa`
 
-## 安装
+# 1. 安装
 ```
 npm install web-route --save
 ```
 
-## 使用示例
+# 2. 使用示例
+## 2.1 服务启动
 ```typescript
 // index.ts
 import Koa from 'koa';
@@ -21,7 +22,19 @@ import { register } from 'web-route';
 const app = new Koa();
 
 const router = register({
-  cwd: path.resolve(__dirname, './controllers/*.ts')  // 设置 controller 文件 glob 路径
+  // 设置 controller 文件 glob 路径（以 typescript 注解方式注册路由，详见2.2）
+  annControllerPath: path.resolve(__dirname, './controllers/*.ts'),
+  
+  // 设置 controller 文件 glob 路径（commonjs 普通方式注册路由，详见2.3）
+  controllerPath: path.resolve(__dirname, './controllers/*.js'),  
+
+  // 全局设置接口默认配置
+  defaultConfig: {
+    // 全局接口默认为 get
+    method: 'get',
+    // 全局接口支持跨域
+    cors: true,
+  },
 });
 
 app.use(router.routes());
@@ -29,6 +42,9 @@ app.listen(8080, () => {
   console.log('启动。。。');
 });
 ```
+<br/>
+
+## 2.2 以 typescript 注解方式注册路由
 ```typescript
 // controller/hi.ts
 import { RequestMapping, ValidParam, ValidParamRule } from "web-route";
@@ -52,7 +68,25 @@ class HiController {
 
 export default HiController;
 ```
+<br/>
 
+## 2.3 commonjs 普通方式注册路由
+```javascript
+module.exports = [{
+  path: '/js/hello',
+  method: 'get',
+  cors: true,
+  handler(ctx, next) {
+      ctx.body = {
+        success: true,
+        msg: 'hello'
+      };
+  }
+}];
+```
+<br/>
+
+## 2.4 接口测试
 ```shell
 # 发送测试请求
 curl --location --request GET 'http://localhost:8080/hi/sayHiAgain?a=hello' \

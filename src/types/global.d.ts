@@ -1,9 +1,11 @@
-import Koa from 'koa';
+import { Context, Next } from 'koa';
 import { HTTP_METHOD } from 'src/lib/const';
 export type CORS_CONFIG = { origin?: string, headers?: string, methods?: string, credentials?: string };
 export type CORS = boolean | CORS_CONFIG;
-export type SingleHandler = (ctx: Koa.Context, next: Koa.Next) => void | Promise<void>;
-export type Handler = SingleHandler;
+export type Handler = (ctx: Context, next: Next) => void | Promise<void>;
+export type AuthValidateFn = (ctx: Context, next?: Next) => boolean | Promise<boolean>
+export type validFn = (paramName: string, paramValue: any, requestBody?: Record<string, any>, ctx?: Context) => string | boolean | Promise<string> | Promise<boolean>;
+export type ParamValidateFn = { [name: string]: validFn | validFn[] };
 
 export type RouteConfig = {
   path: string;
@@ -13,6 +15,7 @@ export type RouteConfig = {
   cors?: CORS;
   authValidate?: AuthValidateFn;
   isAuthValidate?: boolean;
+  paramValidate?: ParamValidateFn;
 }
 
 // 注解方式可配置的 config
@@ -32,10 +35,8 @@ export type RequestLogCallbackFn = (info: {
   startTime: number;
   endTime: number;
   duration: number;
-  ctx: Koa.Context;
+  ctx: Context;
 }) => void;
-
-type AuthValidateFn = (ctx: Koa.Context, next?: Koa.Next) => boolean | Promise<boolean>
 
 export type RegisterOptions = { 
   annControllerPath?: string,                 // 注解方式编译时加载路由的模块 glob 路径

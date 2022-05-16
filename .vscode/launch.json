@@ -17,11 +17,11 @@
       "runtimeArgs": [
         "--nolazy",
         "-r",
-        "ts-node/register",
+        "./.vscode/ts-node.js"
+        // "ts-node/register"
       ],
       "sourceMaps": true,
       "cwd": "${workspaceRoot}",
-      "protocol": "inspector",
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
       "restart": true,

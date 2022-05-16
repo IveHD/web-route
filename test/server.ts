@@ -12,10 +12,10 @@ const router = register({
     isAuthValidate: true,
   },
   authValidate(ctx) {
-    ctx.body = {
-      success: false,
-      info: 'no auth',
-    };
+    // ctx.body = {
+    //   success: false,
+    //   info: 'no auth',
+    // };
     return false;
   },
   requestLogCallback(info) {

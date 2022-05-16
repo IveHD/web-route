@@ -1,16 +1,13 @@
 
-import RouteMapping from '../mapping/route';
-import { HTTP_METHOD } from '../lib/const';
+import RouteMapping from '../core/route';
 import { AnnotationRouteConfig } from 'src/types/global';
 
 const RequestMapping = (config: string | AnnotationRouteConfig) => {
-  let path = '/';
-  let method;
+  let configObj: AnnotationRouteConfig = { path: '/' };
   if (typeof config === 'string') {
-    path = config;
+    configObj.path = config;
   } else {
-    path = config.path;
-    method = config.method?.toLowerCase();
+    configObj = { ... config };
   }
   return (...args) => {
     const [target, property] = args;
@@ -19,12 +16,11 @@ const RequestMapping = (config: string | AnnotationRouteConfig) => {
       if (typeof config !== 'string') {
         throw new Error('Expected 1 argument when RequestMapping is used as class decorator');
       }
-      RouteMapping.addGroupRoute(path, target);
+      RouteMapping.addGroupRoute(configObj.path, target);
     } else {
       RouteMapping.addRoute({
-        path,
-        method,
-        handler,
+        ...configObj,
+        handler
       }, target.constructor);
     }
   }

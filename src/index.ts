@@ -3,7 +3,7 @@ import {
   ValidParam,
 } from './annotation';
 import glob from 'glob';
-import RouteMapping from './mapping/route';
+import RouteMapping from './core/route';
 import ValidParamRule from './validParamRule/index';
 import { HTTP_METHOD } from './lib/const';
 import KoaRouter from 'koa-router';
@@ -11,7 +11,10 @@ import { ROUTE, RegisterOptions } from './types/global';
 import { setConfig } from './lib/config';
 const bodyParser = require('./lib/bodyParser');
 const router = new KoaRouter();
-const parser = bodyParser({});
+const parser = bodyParser({
+  jsonLimit: '5mb',
+  formLimit: '1mb',
+});
 
 function register(options: RegisterOptions): KoaRouter {
   const { defaultConfig, authValidate } = options;

@@ -3,6 +3,7 @@ import { GROUP_ROUTE, ROUTE, RouteConfig } from '../types/global';
 import { EXCEPTION_CODE, HTTP_METHOD } from '../lib/const';
 import { setCorsHeader } from '../lib/cors';
 import { getConfig } from '../lib/config';
+import { isPost } from '../lib/util';
 
 const DEFAULT_CONFIG = getConfig();
 
@@ -31,7 +32,7 @@ class Mapping {
   }
 
   addRoute(config: RouteConfig, ctor?: Function) {
-    const { path, method, handler, cors, authValidate, isAuthValidate } = Object.assign({}, DEFAULT_CONFIG, config);
+    const { path, method, handler, cors, paramValidate, authValidate, isAuthValidate } = Object.assign({}, DEFAULT_CONFIG, config);
     const addRoute = ctor ? this.doAddAnnotationRoute.bind(this, ctor) : this.doAddRoute.bind(this);
     // 跨域预检请求
     if (cors) {
@@ -48,6 +49,12 @@ class Mapping {
       path,
       method,
       handler: async (ctx, next) => {
+        // CORS 跨域
+        if (cors) {
+          setCorsHeader(ctx, typeof cors === 'boolean' ? { methods: method } : Object.assign({ methods: method }, cors));
+        }
+
+        // 权限校验
         if (isAuthValidate === true && typeof authValidate === 'function' && !await authValidate(ctx, next)) {
           if (!ctx.body) {
             ctx.body = {
@@ -58,6 +65,8 @@ class Mapping {
           }
           return;
         }
+
+        // content-type 校验
         if (typeof config !== 'string' && config.contentType && ctx.header['content-type'] !== config.contentType) {
           const EXCEPTION = EXCEPTION_CODE.UNSUPPORTED_CONTENT_TYPE
           ctx.body = {
@@ -67,9 +76,30 @@ class Mapping {
           };
           return;
         }
-        if (cors) {
-          setCorsHeader(ctx, typeof cors === 'boolean' ? { methods: method } : Object.assign({ methods: method }, cors));
+
+        if (paramValidate !== undefined) {
+          const body = isPost(ctx) ? ctx.request.body : ctx.request.query;  // src/index.ts 内做了 bodyParser
+          const invalidList: string[] = [];
+          for(const p in paramValidate) {
+            const validFns = Array.isArray(paramValidate[p]) ? paramValidate[p] : [paramValidate[p]];
+            for(let i = 0; i < validFns.length; i++){
+              const validFn = validFns[i];
+              const result = await validFn(p, body[p], body, ctx);
+              if (typeof result === 'string') {
+                invalidList.push(result);
+              }
+            }
+          }
+          if (invalidList.length) {
+            ctx.body = {
+              success: false,
+              code: EXCEPTION_CODE.PARAM_INVALID.CODE,
+              info: invalidList.join(';')
+            };
+            return;
+          }
         }
+
         await handler(ctx, next);
       },
     });
