@@ -5,7 +5,7 @@ import {
 import glob from 'glob';
 import RouteMapping from './core/route';
 import ValidParamRule from './validParamRule/index';
-import { HTTP_METHOD } from './lib/const';
+import { HTTP_METHOD, CONTENT_TYPE } from './lib/const';
 import KoaRouter from 'koa-router';
 import { ROUTE, RegisterOptions } from './types/global';
 import { setConfig } from './lib/config';
@@ -82,5 +82,6 @@ export {
   getRouteData,
   ValidParamRule,
   HTTP_METHOD,
+  CONTENT_TYPE
 };
 export default null;

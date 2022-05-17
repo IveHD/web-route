@@ -4,7 +4,7 @@ import { HTTP_METHOD } from './const';
 const config: GlobalRouteConfig = {
   method: HTTP_METHOD.GET,
   cors: false,
-  isAuthValidate: true,
+  isAuthValidate: false,
 };
 
 export const setConfig = _config => {

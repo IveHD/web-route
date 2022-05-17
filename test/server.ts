@@ -9,15 +9,15 @@ const router = register({
   controllerPath: path.resolve(__dirname, './controllers/*.js'),
   defaultConfig: {
     method: 'get',
-    isAuthValidate: true,
+    // isAuthValidate: true,
   },
-  authValidate(ctx) {
-    // ctx.body = {
-    //   success: false,
-    //   info: 'no auth',
-    // };
-    return false;
-  },
+  // authValidate(ctx) {
+  //   // ctx.body = {
+  //   //   success: false,
+  //   //   info: 'no auth',
+  //   // };
+  //   return false;
+  // },
   requestLogCallback(info) {
     console.log(info.duration);
   }
