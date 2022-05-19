@@ -34,7 +34,15 @@ class HiController {
   async fn2(ctx: Context) {
     ctx.body = {
       success: true,
-      msg: 'paramValid'
+      msg: 'contentType'
+    };
+  }
+
+  @RequestMapping({ path: '/cors1', method: 'post', cors: true })
+  async fn3(ctx: Context) {
+    ctx.body = {
+      success: true,
+      msg: 'cors1'
     };
   }
 }

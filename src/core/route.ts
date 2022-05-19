@@ -3,7 +3,7 @@ import { GROUP_ROUTE, ROUTE, RouteConfig } from '../types/global';
 import { EXCEPTION_CODE, HTTP_METHOD } from '../lib/const';
 import { setCorsHeader } from '../lib/cors';
 import { getConfig } from '../lib/config';
-import { isPost } from '../lib/util';
+import { isPost, lowerCaseTrim } from '../lib/util';
 
 const DEFAULT_CONFIG = getConfig();
 
@@ -67,7 +67,8 @@ class Mapping {
         }
 
         // content-type 校验
-        if (typeof config !== 'string' && config.contentType && ctx.header['content-type'] !== config.contentType) {
+        console.log(lowerCaseTrim(ctx.header['content-type'] || ''), lowerCaseTrim(config.contentType || ''));
+        if (typeof config !== 'string' && config.contentType && lowerCaseTrim(ctx.header['content-type'] || '') !== lowerCaseTrim(config.contentType || '')) {
           const EXCEPTION = EXCEPTION_CODE.UNSUPPORTED_CONTENT_TYPE
           ctx.body = {
             success: false,
