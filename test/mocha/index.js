@@ -144,6 +144,21 @@ describe('#content-type 校验', () => {
 });
 
 describe('#CORS 跨域', () => {
+  it('#ts cors 预检', (done) => {
+    axios.options(`${domain}/ts_api/cors1`).then(res => {
+      const { headers } = res;
+      if(
+        headers['access-control-allow-credentials']
+        && headers['access-control-allow-headers']
+        && headers['access-control-allow-methods']
+        && headers['access-control-allow-origin']
+      ) done();
+      else done(res.data);
+    }).catch(err => {
+      done(err);
+    });
+  });
+
   it('#ts cors 跨域', (done) => {
     axios.post(`${domain}/ts_api/cors1`).then(res => {
       const { headers } = res;
@@ -159,6 +174,68 @@ describe('#CORS 跨域', () => {
     });
   });
 
-  // todo 预检跨域
-  // todo js 跨域
+  it('#js cors 预检', (done) => {
+    axios.options(`${domain}/js_api/cors1`).then(res => {
+      const { headers } = res;
+      if(
+        headers['access-control-allow-credentials']
+        && headers['access-control-allow-headers']
+        && headers['access-control-allow-methods']
+        && headers['access-control-allow-origin']
+      ) done();
+      else done(res.data);
+    }).catch(err => {
+      done(err);
+    });
+  });
+
+  it('#js cors 跨域', (done) => {
+    axios.post(`${domain}/js_api/cors1`).then(res => {
+      const { headers } = res;
+      if(
+        headers['access-control-allow-credentials']
+        && headers['access-control-allow-headers']
+        && headers['access-control-allow-methods']
+        && headers['access-control-allow-origin']
+      ) done();
+      else done(res.data);
+    }).catch(err => {
+      done(err);
+    });
+  });
+});
+
+describe('#权限校验', () => {
+  it('#ts 权限不通过', done => {
+    axios.post(`${domain}/ts_api/auth`).then(res => {
+      if (res.data.success === false && res.data.code === 401) done();
+      else done(res.data);
+    }).catch(err => {
+      done(err);
+    });
+  });
+  it('#ts 权限通过', done => {
+    axios.post(`${domain}/ts_api/auth`, null, { headers: { token: 'token_string' } }).then(res => {
+      if (res.data.success) done();
+      else done(res.data);
+    }).catch(err => {
+      done(err);
+    });
+  });
+  it('js 权限不通过', done => {
+    axios.post(`${domain}/js_api/auth`).then(res => {
+      if (res.data.success === false && res.data.code === 401) done();
+      else done(res.data);
+    }).catch(err => {
+      done(err);
+    });
+  });
+  it('#js 权限通过', done => {
+    axios.post(`${domain}/js_api/auth`, null, { headers: { token: 'token_string' } }).then(res => {
+      if (res.data.success) done();
+      else done(res.data);
+    }).catch(err => {
+      done(err);
+    });
+  });
 });

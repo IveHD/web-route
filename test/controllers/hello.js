@@ -1,4 +1,4 @@
-const { ValidParamRule, CONTENT_TYPE } = require("../../src/index");
+const { ValidParamRule, CONTENT_TYPE, NO_AUTH_BODY } = require("../../src/index");
 
 module.exports = [{
   path: '/js_api/registByString',
@@ -38,6 +38,30 @@ module.exports = [{
     ctx.body = {
       success: true,
       msg: 'post'
+    };
+  }
+}, {
+  path: '/js_api/cors1',
+  method: 'post',
+  cors: true,
+  handler(ctx, next) {
+    ctx.body = {
+      success: true,
+      msg: 'post'
+    };
+  }
+}, {
+  path: '/js_api/auth',
+  method: 'post',
+  authValidate: (ctx, next) => {
+    const token = ctx.get('token');
+    if(token) next();
+    else ctx.body = NO_AUTH_BODY;
+  },
+  handler(ctx, next) {
+    ctx.body = {
+      success: true,
+      msg: 'auth'
     };
   }
 }];

@@ -6,6 +6,7 @@ import glob from 'glob';
 import RouteMapping from './core/route';
 import ValidParamRule from './validParamRule/index';
 import { HTTP_METHOD, CONTENT_TYPE } from './lib/const';
+import { NO_AUTH_BODY } from './core/authValidate';
 import KoaRouter from 'koa-router';
 import { ROUTE, RegisterOptions } from './types/global';
 import { setConfig } from './lib/config';
@@ -17,11 +18,13 @@ const parser = bodyParser({
 });
 
 function register(options: RegisterOptions): KoaRouter {
-  const { defaultConfig, authValidate } = options;
-  setConfig({...defaultConfig, authValidate});
+  const { defaultConfig = {} } = options;
+  setConfig({ ...defaultConfig });
   
   let routeData: ROUTE[] = [];
   const { annControllerPath, controllerPath } = options;
+  
+  // 利用注解的编译过程直接向 RouteMapping 添加路由配置
   if (annControllerPath) {
     const annList = glob.sync(options.annControllerPath);
     annList.forEach(p => {
@@ -29,6 +32,7 @@ function register(options: RegisterOptions): KoaRouter {
     });
   }
   
+  // 通过 commonjs module 获取路由配置并向 RouteMapping 添加路由配置
   if (controllerPath) {
     const list =  glob.sync(options.controllerPath);
     list.forEach(p => {
@@ -40,8 +44,8 @@ function register(options: RegisterOptions): KoaRouter {
     });
   }
 
-  Array.prototype.push.apply(routeData, getRouteData());
-  
+  // 获取所有路由配置信息，并向 router 注册
+  Array.prototype.push.apply(routeData, getRouteData());  
   routeData.forEach(r => {
     const handler = Array.isArray(r.handler) ? r.handler : [r.handler];
     router[r.method](r.path, ...handler);
@@ -82,6 +86,7 @@ export {
   getRouteData,
   ValidParamRule,
   HTTP_METHOD,
-  CONTENT_TYPE
+  CONTENT_TYPE,
+  NO_AUTH_BODY
 };
 export default null;

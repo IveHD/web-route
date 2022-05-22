@@ -6,14 +6,10 @@ module.exports = {
   defaultConfig: {
     method: 'get',
     // isAuthValidate: true,
+    // authValidate(ctx, next) {
+    //   return next();
+    // },
   },
-  // authValidate(ctx) {
-  //   // ctx.body = {
-  //   //   success: false,
-  //   //   info: 'no auth',
-  //   // };
-  //   return false;
-  // },
   requestLogCallback(info) {
     console.log(info.duration);
   }

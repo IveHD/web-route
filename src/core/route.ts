@@ -1,9 +1,13 @@
 import path from 'path';
-import { GROUP_ROUTE, ROUTE, RouteConfig } from '../types/global';
-import { EXCEPTION_CODE, HTTP_METHOD } from '../lib/const';
-import { setCorsHeader } from '../lib/cors';
 import { getConfig } from '../lib/config';
+import { GROUP_ROUTE, ROUTE, RouteConfig, CORS } from '../types/global';
+import { EXCEPTION_CODE, HTTP_METHOD } from '../lib/const';
+import corsMiddleware, { setCorsHeader } from './cors';
+import contentType from './contentType';
+import paramValid from './paramValid';
 import { isPost, lowerCaseTrim } from '../lib/util';
+import { Middleware } from 'koa';
+import authValidate from './authValidate';
 
 const DEFAULT_CONFIG = getConfig();
 
@@ -32,77 +36,38 @@ class Mapping {
   }
 
   addRoute(config: RouteConfig, ctor?: Function) {
-    const { path, method, handler, cors, paramValidate, authValidate, isAuthValidate } = Object.assign({}, DEFAULT_CONFIG, config);
+    let { path, method, handler, cors } = Object.assign({}, DEFAULT_CONFIG, config);
     const addRoute = ctor ? this.doAddAnnotationRoute.bind(this, ctor) : this.doAddRoute.bind(this);
-    // 跨域预检请求
+
+    let middleware: Middleware[] = [];
+    
+    // 跨域
     if (cors) {
+      // 跨域预检请求
       addRoute({
         path,
         method: 'options',
         handler: async (ctx, next) => {
           ctx.response.status = 200;
-          setCorsHeader(ctx, typeof cors === 'boolean' ? { methods: method } : Object.assign({ methods: method }, cors));
+          setCorsHeader(ctx, <CORS>cors);
         }
       });
+      middleware.push(corsMiddleware(cors));
     }
+
+    middleware.push(
+      contentType(config),
+      authValidate(config),
+      paramValid(config),
+    );
+
+    if(typeof handler === 'function') middleware.push(handler);
+    else if (Array.isArray(handler)) middleware.push(...handler);
+
     addRoute({
       path,
       method,
-      handler: async (ctx, next) => {
-        // CORS 跨域
-        if (cors) {
-          setCorsHeader(ctx, typeof cors === 'boolean' ? { methods: method } : Object.assign({ methods: method }, cors));
-        }
-
-        // 权限校验
-        if (isAuthValidate === true && typeof authValidate === 'function' && !await authValidate(ctx, next)) {
-          if (!ctx.body) {
-            ctx.body = {
-              success: false,
-              code: EXCEPTION_CODE.NO_AUTH.CODE,
-              info: EXCEPTION_CODE.NO_AUTH.INFO
-            };
-          }
-          return;
-        }
-
-        // content-type 校验
-        console.log(lowerCaseTrim(ctx.header['content-type'] || ''), lowerCaseTrim(config.contentType || ''));
-        if (typeof config !== 'string' && config.contentType && lowerCaseTrim(ctx.header['content-type'] || '') !== lowerCaseTrim(config.contentType || '')) {
-          const EXCEPTION = EXCEPTION_CODE.UNSUPPORTED_CONTENT_TYPE
-          ctx.body = {
-            success: false,
-            code: EXCEPTION.CODE,
-            info: EXCEPTION.INFO
-          };
-          return;
-        }
-
-        if (paramValidate !== undefined) {
-          const body = isPost(ctx) ? ctx.request.body : ctx.request.query;  // src/index.ts 内做了 bodyParser
-          const invalidList: string[] = [];
-          for(const p in paramValidate) {
-            const validFns = Array.isArray(paramValidate[p]) ? paramValidate[p] : [paramValidate[p]];
-            for(let i = 0; i < validFns.length; i++){
-              const validFn = validFns[i];
-              const result = await validFn(p, body[p], body, ctx);
-              if (typeof result === 'string') {
-                invalidList.push(result);
-              }
-            }
-          }
-          if (invalidList.length) {
-            ctx.body = {
-              success: false,
-              code: EXCEPTION_CODE.PARAM_INVALID.CODE,
-              info: invalidList.join(';')
-            };
-            return;
-          }
-        }
-
-        await handler(ctx, next);
-      },
+      handler: middleware
     });
   }
 
@@ -118,12 +83,11 @@ class Mapping {
     }
   }
 
-  list() {
-    return this.map;
-  }
-
   getRouteData(): ROUTE[] {
+    // connmonjs 的路由直接加进来
     const data: ROUTE[] = [...this.routes];
+
+    // 遍历并加进来注解的路由
     this.map.forEach((value, key) => {
       if (value.prefix === null) return;
       value.routes.forEach((e) => {

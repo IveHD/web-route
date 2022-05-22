@@ -1,19 +1,21 @@
-import { Context, Next } from 'koa';
+import { Context, Next, Middleware } from 'koa';
 import { HTTP_METHOD } from 'src/lib/const';
 export type CORS_CONFIG = { origin?: string, headers?: string, methods?: string, credentials?: string };
 export type CORS = boolean | CORS_CONFIG;
 export type Handler = (ctx: Context, next: Next) => void | Promise<void>;
-export type AuthValidateFn = (ctx: Context, next?: Next) => boolean | Promise<boolean>
+export type Handlers = Handler[];
+export type AuthValidateFn = Middleware;
 export type validFn = (paramName: string, paramValue: any, requestBody?: Record<string, any>, ctx?: Context) => string | boolean | Promise<string> | Promise<boolean>;
 export type ParamValidateFn = { [name: string]: validFn | validFn[] };
 
 export type RouteConfig = {
   path: string;
-  handler: Handler;
+  handler: Handler | Handlers;
   method?: typeof HTTP_METHOD[keyof typeof HTTP_METHOD];
-  contentType?: string;
   cors?: CORS;
-  authValidate?: AuthValidateFn;
+  originWhiteList?: string[];
+  contentType?: string;
+  authValidate?: Middleware;
   isAuthValidate?: boolean;
   paramValidate?: ParamValidateFn;
 }
@@ -42,6 +44,6 @@ export type RegisterOptions = {
   annControllerPath?: string,                 // 注解方式编译时加载路由的模块 glob 路径
   controllerPath?: string;                    // commonjs 运行时方式加载路由的模块 glob 路径
   defaultConfig?: GlobalRouteConfig,          // 指定接口的全局默认配置
-  authValidate?: AuthValidateFn,               // 用于验证身份的钩子函数
+  // authValidate?: Middleware,                  // 用于验证身份的中间件函数
   requestLogCallback?: RequestLogCallbackFn   // 获取请求日志的回调函数
 };

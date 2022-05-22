@@ -1,4 +1,4 @@
-import { RequestMapping, ValidParamRule, CONTENT_TYPE } from "../../src/index";
+import { RequestMapping, ValidParamRule, CONTENT_TYPE, NO_AUTH_BODY } from "../../src/index";
 import { Context } from "koa";
 
 @RequestMapping('/ts_api/')
@@ -43,6 +43,18 @@ class HiController {
     ctx.body = {
       success: true,
       msg: 'cors1'
+    };
+  }
+
+  @RequestMapping({ path: '/auth', method: 'post', authValidate: (ctx, next) => {
+    const token = ctx.get('token');
+    if(token) next();
+    else ctx.body = NO_AUTH_BODY;
+  }})
+  async fn4(ctx: Context) {
+    ctx.body = {
+      success: true,
+      msg: 'auth'
     };
   }
 }
