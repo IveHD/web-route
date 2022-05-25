@@ -54,7 +54,23 @@ class HiController {
   async fn4(ctx: Context) {
     ctx.body = {
       success: true,
-      msg: 'auth'
+      msg: 'originWhiteList'
+    };
+  }
+
+  @RequestMapping({ path: '/originWhiteList', method: 'post', originWhiteList: ['http://127.0.0.1:8080'] })
+  async fn5(ctx: Context) {
+    ctx.body = {
+      success: true,
+      msg: 'originWhiteList'
+    };
+  }
+
+  @RequestMapping({ path: '/originWhiteList1', method: 'post', originWhiteList: ['no'] })
+  async fn6(ctx: Context) {
+    ctx.body = {
+      success: true,
+      msg: 'originWhiteList'
     };
   }
 }

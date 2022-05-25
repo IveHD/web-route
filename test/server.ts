@@ -1,5 +1,4 @@
 import Koa from 'koa';
-import path from 'path';
 import { register } from '../src';
 import config from './registerConfig.js';
 

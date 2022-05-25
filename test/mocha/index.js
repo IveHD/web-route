@@ -239,3 +239,38 @@ describe('#权限校验', () => {
     });
   });
 });
+
+describe('#访问源白名单', () => {
+  it('#ts 权限不通过', done => {
+    axios.post(`${domain}/ts_api/originWhiteList1`).then(res => {
+      done(res.data);
+    }).catch(err => {
+      if(err.response.status === 403) done();
+      else done(err);
+    });
+  });
+  it('#ts 权限通过', done => {
+    axios.post(`${domain}/ts_api/originWhiteList`, null).then(res => {
+      if (res.data.success) done();
+      else done(res.data);
+    }).catch(err => {
+      done(err);
+    });
+  });
+  it('js 权限不通过', done => {
+    axios.post(`${domain}/js_api/originWhiteList1`).then(res => {
+      done(res.data);
+    }).catch(err => {
+      if(err.response.status === 403) done();
+      else done(err);
+    });
+  });
+  it('#js 权限通过', done => {
+    axios.post(`${domain}/js_api/originWhiteList`, null).then(res => {
+      if (res.data.success) done();
+      else done(res.data);
+    }).catch(err => {
+      done(err);
+    });
+  });
+});

@@ -5,9 +5,9 @@ import { EXCEPTION_CODE, HTTP_METHOD } from '../lib/const';
 import corsMiddleware, { setCorsHeader } from './cors';
 import contentType from './contentType';
 import paramValid from './paramValid';
-import { isPost, lowerCaseTrim } from '../lib/util';
 import { Middleware } from 'koa';
 import authValidate from './authValidate';
+import originWhiteList from './originWhiteList';
 
 const DEFAULT_CONFIG = getConfig();
 
@@ -56,6 +56,7 @@ class Mapping {
     }
 
     middleware.push(
+      originWhiteList(config),
       contentType(config),
       authValidate(config),
       paramValid(config),

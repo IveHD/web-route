@@ -64,4 +64,24 @@ module.exports = [{
       msg: 'auth'
     };
   }
+}, {
+  path: '/js_api/originWhiteList',
+  method: 'post',
+  originWhiteList: ['http://127.0.0.1:8080'],
+  handler(ctx, next) {
+    ctx.body = {
+      success: true,
+      msg: 'originWhiteList'
+    };
+  }
+}, {
+  path: '/js_api/originWhiteList1',
+  method: 'post',
+  originWhiteList: ['no'],
+  handler(ctx, next) {
+    ctx.body = {
+      success: true,
+      msg: 'originWhiteList'
+    };
+  }
 }];
