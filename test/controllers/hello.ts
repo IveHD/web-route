@@ -1,4 +1,4 @@
-import { RequestMapping, ValidParamRule, CONTENT_TYPE, NO_AUTH_BODY } from "../../src/index";
+import { RequestMapping, ParamValidRule, CONTENT_TYPE, NO_AUTH_BODY } from "../../src/index";
 import { Context } from "koa";
 
 @RequestMapping('/ts_api/')
@@ -20,8 +20,8 @@ class HiController {
   }
   
   @RequestMapping({ path: '/paramValid', method: 'post', isAuthValidate: false, paramValidate: {
-    a: [ValidParamRule.REUQIRED, ValidParamRule.STRING],
-    b: ValidParamRule.REUQIRED
+    a: [ParamValidRule.REUQIRED, ParamValidRule.STRING],
+    b: ParamValidRule.REUQIRED
   } })
   async fn1(ctx: Context) {
     ctx.body = {

@@ -1,10 +1,9 @@
 import {
   RequestMapping,
-  ValidParam,
 } from './annotation';
 import glob from 'glob';
 import RouteMapping from './core/route';
-import ValidParamRule from './validParamRule/index';
+import ParamValidRule from './paramValidRule/index';
 import { HTTP_METHOD, CONTENT_TYPE } from './lib/const';
 import { NO_AUTH_BODY } from './core/authValidate';
 import KoaRouter from 'koa-router';
@@ -82,9 +81,8 @@ function getRouteData() {
 export {
   register,
   RequestMapping,
-  ValidParam,
   getRouteData,
-  ValidParamRule,
+  ParamValidRule,
   HTTP_METHOD,
   CONTENT_TYPE,
   NO_AUTH_BODY

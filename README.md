@@ -71,7 +71,7 @@ app.listen(8080, () => {
 ## 2.2 以 typescript 注解方式注册路由
 ```typescript
 // controller/hi.ts
-import { RequestMapping, ValidParamRule } from "web-route";
+import { RequestMapping, ParamValidRule } from "web-route";
 import { Context } from "koa";
 
 @RequestMapping('/hi')  // 定义模块内路由的路径前缀
@@ -79,8 +79,8 @@ class HiController {
   
   // 定义路径为 /hi/sayHiAgain、请求方式为 get、允许跨域、验证参数 a 为必填且为字符串 & 参数 b 为必填
   @RequestMapping({ path: '/sayHiAgain', method: 'get', cors: true, paramValidate: {
-    a: [ValidParamRule.REUQIRED, ValidParamRule.STRING],
-    b: ValidParamRule.REUQIRED
+    a: [ParamValidRule.REUQIRED, ParamValidRule.STRING],
+    b: ParamValidRule.REUQIRED
   } }) 
   sayHiAgain(ctx: Context) {
     console.log('hi world again...');
@@ -151,7 +151,7 @@ type RegisterOptions = {
   requestLogCallback?: RequestLogCallbackFn   // 获取请求日志的回调函数
 };
 ```
-### RegisterOptions
+#### RegisterOptions
 |属性|说明|类型|可选值|默认值|
 |---|---|---|---|---|
 |annControllerPath|ts 注解方式加载路由的模块 glob 路径|string|有效的glob路径|无|
@@ -160,7 +160,7 @@ type RegisterOptions = {
 
 <br/>
 
-### GlobalRouteConfig
+#### GlobalRouteConfig
 |属性|说明|类型|可选值|默认值|
 |---|---|---|---|---|
 |method|接口全局请求方法|string|有效的 http 请求方法|get|
@@ -177,6 +177,8 @@ type RegisterOptions = {
 支持两种方式加载路由：
 * ts 注解方式：在类的方法上使用 @RequestMapping 注解，并向 @RequestMapping 传入配置对象。
 * js commonjs 方式：module.exports 导出接口配置的集合。
+
+两种方式只是写法不同以及注解方式能够指定模块内接口统一的path前缀，除此以外接口的配置完全相同，配置如下。
 
 <br/>
 
@@ -208,24 +210,128 @@ type RouteConfig = {
 |paramValidate|参数校验配置|boolean|true \| false|无|
 |handler|接口处理逻辑函数或函数集合|function \| function[]|有效的函数逻|无|
 
-#### cors 跨域配置
+#### # cors 跨域配置
+> 1. 如接口被配置成可跨域访问，则会自动为跨域接口添加一个可访问的 options 预检请求接口，以保证非简单跨域请求的访问。
+> 2. 如果接口没做跨域配置，则为 originWhiteList 里面的域名自动添加允许跨域，如果做了跨域配置，则使用配置。
+> 3. 考虑到 JSONP 的方式受原理限制，只能 get、发送的非 XHR 请求、有可能受到 CSP 影响等缺陷，不支持 JSONP 跨域。
+```typescript
+type CORS = boolean | CORS_CONFIG;
+```
 
+* 当 cors 为 false<br/>
+  接口不支持跨域
 
-#### paramValidate 参数校验配置
+* 当 cors 为 true<br/>
+  接口支持跨域，且 cors 跨域响应头如下：
+  ```shell
+  Access-Control-Allow-Origin: '*'
+  Access-Control-Allow-Headers: '*'
+  Access-Control-Allow-Methods: '*'
+  Access-Control-Allow-Credentials: true
+  ```
 
-#### handler 接口处理逻辑
+* 当 cors 为配置对象 CORS_CONFIG，详细配置响应头
+  ```typescript
+  type CORS_CONFIG = {
+    origin?: string,
+    headers?: string,
+    methods?: string,
+    credentials?: string
+  };
+  ```
+  ##### CORS_CONFIG
+  |属性|说明|类型|可选值|默认值|
+  |---|---|---|---|---|
+  |origin|指定 [Access-Control-Allow-Origin](https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Headers/Access-Control-Allow-Origin)|string|protocol://domain|*|
+  |headers|指定 [Access-Control-Allow-Headers](https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Headers/Access-Control-Allow-Headers)|string|有效的 http 请求方法|*|
+  |methods|指定 [Access-Control-Allow-Methods](https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Headers/Access-Control-Allow-Methods)|string|有效的 http 请求方法|*|
+  |credentials|指定 [Access-Control-Allow-Credentials](https://developer.mozilla.org/zh-CN/docs/web/http/headers/access-control-allow-credentials)|boolean|true|true|
+
+<br/>
+<br/>
+
+#### # paramValidate 参数校验配置
+```typescript
+type validFn = (paramName: string, paramValue: any, requestBody?: Record<string, any>, ctx?: Context) => string | boolean | Promise<string> | Promise<boolean>;
+
+type ParamValidateFn = { [name: string]: validFn | validFn[] };
+```
+先举个栗子：
+```typescript
+{
+  // ...其他配置...
+  paramValidate: {
+    param1: (name, value) => {
+      // 验证逻辑
+      if ('校验成功') {
+        return true;
+      } else {
+        return '失败提示';
+      }
+    },
+    param2: [
+      (name, value, requestBody, ctx) => {
+        // 验证逻辑1
+        if ('校验成功') {
+          return true;
+        } else {
+          return '失败提示';
+        }
+      },
+      (name, value, requestBody, ctx) => {
+        // 验证逻辑2
+        if ('校验成功') {
+          return true;
+        } else {
+          return '失败提示';
+        }
+      }
+    ]
+  }
+  // ...其他配置...
+}
+```
+说明：
+* paramValidate 是一个对象，对象属性为参数名，对象值为校验函数或校验函数的集合(多个校验条件)。
+* 校验函数可接收四个参数，分别是 参数名、参数值、所有请求参数、Koa 的 ctx。
+* 检验函数返回字符串将被认作校验不通过，且字符串将被作为校验不成功的提示，无返回值或返回值非字符串，则认为校验通过。
+web-route 内置了常用的参数校验函数，通过 ParamValidRule 对外暴露
+  ```typescript
+  import { ParamValidRule } from "web-route";
+  // 或
+  const { ParamValidRule } = require("web-route");
+  ```
+  |函数名|校验逻辑|
+  |---|---|
+  |REUQIRED|必填|
+  |STRING|字符串|
+  |NUMBER|数字|
+  |EMAIL|邮箱地址|
+  |URL|url|
+  |MOBILE_NUMBER|11位手机号|
+  |TELEPHONE_NUMBER|座机号，是否包含区号均可|
+  |PHONE_NUMBER|11位手机号或座机号|
+  |ID_CARD_NUMBER|身份证号|
+  |CN|全中文|
+  |NO_SPACE|不包含空格|
+  |NO_SPECIAL_CHAR|中文、英文、数字、下划线组成|
+
+<br/>
+<br/>
 
 ### 3.2.2 ts 注解配置接口
 ```typescript
-import { RequestMapping, ValidParamRule } from "web-route";
-import { Context } from "koa";
+import { RequestMapping, ParamValidRule } from "web-route";
+import { Context, Next } from "koa";
 
 @RequestMapping('/hi')  // 定义模块内路由的路径前缀
 class HiController {
   
   // 定义路径为 /hi/sayHiAgain、请求方式为 get、允许跨域、验证参数 a 为必填且为字符串 & 参数 b 为必填
-  @RequestMapping() 
-  sayHiAgain(ctx: Context) {
+  @RequestMapping({ 
+    // ...这里写接口配置...
+  }) 
+  sayHi(ctx: Context, next: Next) {
     console.log('hi world again...');
     ctx.body = {
       success: true,
@@ -234,76 +340,20 @@ class HiController {
 }
 ```
 
+<br/>
+<br/>
 
 ### 3.2.3 js commonjs 模块配置接口
-
-
-@RequestMapping 用于定义接口路由，有两种使用方式：<br/>
-#### 1. 修饰路由模块 class
-  * 参数
-    * `prefix: string` class内路由的路径前缀  
-  * 用法<br/>
-    类内定义的路由函数最终访问路径前都将加上这里定义的前缀，此时 RequestMapping 的参数只能是 string。
-
-#### 2. 修饰路由方法
-  * 参数
-    * `config: string | Object`
-  * 用法<br/>
-    当参数为 string，则参数被当做路由定义中的 path，其他定义使用默认值。更丰富的配置传递路由配置对象即可，支持的配置属性如下：
-
-    **路由配置属性：**
-    |属性|说明|类型|可选值|默认值|
-    |---|---|---|---|---|
-    |path|接口路径|string|任何路径|无|
-    |method|请求方法|string|get \| post \| put \| head |get|
-    |contentType|content-type|string|-|无|
-    |cors|跨域配置|Boolean \| Object|true\|false\|跨域配置对象|false，不支持跨域|
-
-    **跨域配置对象：**
-    |属性|说明|类型|可选值|默认值|
-    |---|---|---|---|---|
-    |origin|返回头：Access-Control-Allow-Origin|string|-|*|
-    |headers|返回头：Access-Control-Allow-Headers|string|-|*|
-    |methods|返回头：Access-Control-Allow-Methods|string|-|GET,HEAD,PUT,POST,DELETE,PATCH|
-    |credentials|返回头：Access-Control-Allow-Credentials|string|true \| false|true|
-
-### 参数校验 @ValidParam & ValidParamRule
-```typescript
-// 检验函数
-type validFn = (paramName: string, paramValue: any, requestBody?: Record<string, any>, ctx?: Context) => string | boolean;
-
-declare const ValidParam: (rule: {
-    [name: string]: validFn | validFn[];
-}) => (...args: any[]) => void;
+```javascript
+module.exports = [{
+  path: '/js/hello',
+  method: 'get',
+  // ...这里写接口配置...
+  handler(ctx, next) {
+      ctx.body = {
+        success: true,
+        msg: 'hello'
+      };
+  }
+}];
 ```
-  * @ValidParam 参数
-    * `rule: Object`
-  * @ValidParam 用法<br/>
-    接收请求参数校验配置对象，形如：
-    ```typescript
-      {
-        param1: function (paramName, paramValue) {  // 单次校验
-          // 校验逻辑
-          if (校验成功) {
-            return true;
-          } else {
-            return '失败提示';
-          }
-        },
-        param2: [function (paramName, paramValue) {  // 多个校验条件
-          // 校验逻辑
-        }, function () {
-          // 校验逻辑
-        }],
-        // ...
-      }
-    ```
-
-  * ValidParamRule<br/>
-  ValidParamRule 对象中集成了常用的校验函数，内容如下：
-
-    |检验逻辑|函数名|
-    |---|---|
-    |必填|ValidParamRule.REUQIRED|
-    |字符串|ValidParamRule.STRING|
-    |数字|ValidParamRule.NUMBER|

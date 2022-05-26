@@ -5,6 +5,7 @@ module.exports = {
   controllerPath: path.resolve(__dirname, './controllers/*.js'),
   defaultConfig: {
     method: 'get',
+    cors: true,
     // isAuthValidate: true,
     // authValidate(ctx, next) {
     //   return next();

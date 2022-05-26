@@ -1,6 +1,6 @@
 import { Context, Next, Middleware } from 'koa';
 import { CONTENT_TYPE, HTTP_METHOD } from '../lib/const';
-export type CORS_CONFIG = { origin?: string, headers?: string, methods?: string, credentials?: string };
+export type CORS_CONFIG = { origin?: string, headers?: string, methods?: string, credentials?: boolean };
 export type CORS = boolean | CORS_CONFIG;
 export type Handler = (ctx: Context, next: Next) => void | Promise<void>;
 export type Handlers = Handler[];

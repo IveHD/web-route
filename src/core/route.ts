@@ -40,23 +40,10 @@ class Mapping {
     const addRoute = ctor ? this.doAddAnnotationRoute.bind(this, ctor) : this.doAddRoute.bind(this);
 
     let middleware: Middleware[] = [];
-    
-    // 跨域
-    if (cors) {
-      // 跨域预检请求
-      addRoute({
-        path,
-        method: 'options',
-        handler: async (ctx, next) => {
-          ctx.response.status = 200;
-          setCorsHeader(ctx, <CORS>cors);
-        }
-      });
-      middleware.push(corsMiddleware(cors));
-    }
 
     middleware.push(
-      originWhiteList(config),
+      corsMiddleware(config, addRoute),
+      originWhiteList(config, addRoute),
       contentType(config),
       authValidate(config),
       paramValid(config),

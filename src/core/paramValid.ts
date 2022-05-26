@@ -20,12 +20,6 @@ export default function paramValidateMiddleware(config: RouteConfig): Middleware
         }
       }
       if (invalidList.length) {
-        console.log(ctx.body);
-        console.log({
-          success: false,
-          code: EXCEPTION_CODE.PARAM_INVALID.CODE,
-          info: invalidList.join(';')
-        });
         ctx.body = {
           success: false,
           code: EXCEPTION_CODE.PARAM_INVALID.CODE,

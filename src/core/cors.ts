@@ -1,30 +1,52 @@
 import { Context, Next, Middleware } from 'koa';
-import { CORS } from "../types/global";
+import { CORS, RouteConfig } from '../types/global';
 
 const corsDefaultHeader = {
   'origin': '*',
   'headers': '*',
-  'methods': 'GET,HEAD,PUT,POST,DELETE,PATCH',
-  'credentials': 'true'
+  'methods': '*',
+  'credentials': true
 };
 
 export const setCorsHeader = (ctx: Context, config: CORS) => {
+  let origin, headers, methods, credentials;
   if (config === true) {
-    ctx.set('Access-Control-Allow-Origin', corsDefaultHeader.origin);
-    ctx.set('Access-Control-Allow-Headers', corsDefaultHeader.headers);
-    ctx.set('Access-Control-Allow-Methods', ctx.request.method);
-    ctx.set('Access-Control-Allow-Credentials', corsDefaultHeader.credentials);
+    origin = corsDefaultHeader.origin;
+    headers = corsDefaultHeader.headers;
+    methods = ctx.request.method;
+    credentials = (corsDefaultHeader.credentials) as unknown as string;
   } else if (typeof config === 'object') {
-    ctx.set('Access-Control-Allow-Origin', config.origin || corsDefaultHeader.origin);
-    ctx.set('Access-Control-Allow-Headers', config.headers || corsDefaultHeader.headers);
-    ctx.set('Access-Control-Allow-Methods', config.methods || ctx.request.method);
-    ctx.set('Access-Control-Allow-Credentials', config.credentials || corsDefaultHeader.credentials);
+    origin = config.origin || corsDefaultHeader.origin;
+    headers = config.headers || corsDefaultHeader.headers;
+    methods = config.methods || ctx.request.method;
+    credentials = (config.credentials || corsDefaultHeader.credentials) as unknown as string;
+  }
+  ctx.set('Access-Control-Allow-Origin', origin);
+  ctx.set('Access-Control-Allow-Headers', headers);
+  ctx.set('Access-Control-Allow-Methods', methods);
+  ctx.set('Access-Control-Allow-Credentials', credentials);
+  if(origin !== '*') {
+    ctx.set('Vary', 'Origin');
   }
 }
 
-export default function corsMiddleware(cors: CORS): Middleware {
+export default function corsMiddleware(config: RouteConfig, addRoute: Function): Middleware {
+  const { path, cors } = config;
+  if(cors) {
+    // 跨域预检请求
+    addRoute({
+      path,
+      method: 'options',
+      handler: async (ctx, next) => {
+        ctx.response.status = 200;
+        setCorsHeader(ctx, cors);
+      }
+    });
+  }
   return async (ctx: Context, next: Next) => {
-    setCorsHeader(ctx, cors);
+    if(cors) {
+      setCorsHeader(ctx, cors);
+    }
     await next();
   };
 }

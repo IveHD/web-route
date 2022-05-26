@@ -1,4 +1,4 @@
-const { ValidParamRule, CONTENT_TYPE, NO_AUTH_BODY } = require("../../src/index");
+const { ParamValidRule, CONTENT_TYPE, NO_AUTH_BODY } = require("../../src/index");
 
 module.exports = [{
   path: '/js_api/registByString',
@@ -21,8 +21,8 @@ module.exports = [{
   path: '/js_api/paramValid',
   method: 'post',
   paramValidate: {
-    a: [ValidParamRule.REUQIRED, ValidParamRule.STRING],
-    b: ValidParamRule.REUQIRED
+    a: [ParamValidRule.REUQIRED, ParamValidRule.STRING],
+    b: ParamValidRule.REUQIRED
   },
   handler(ctx, next) {
     ctx.body = {
