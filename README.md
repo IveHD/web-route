@@ -160,7 +160,7 @@ type RegisterOptions = {
     authValidate?: Middleware;                                       // 权限校验
     isAuthValidate?: boolean;                                        // 是否进行权限校验
   },          
-  requestLogCallback?: RequestLogCallbackFn   // 获取请求日志的回调函数
+  requestLogCallback?: RequestLogCallbackFn   // 每个请求完成后的回调函数
 };
 ```
 #### RegisterOptions
@@ -169,6 +169,7 @@ type RegisterOptions = {
 |annControllerPath|ts 注解方式加载路由的模块 glob 路径|string|有效的glob路径|无|
 |controllerPath|js commonjs 方式加载路由的模块 glob 路径|string|有效的glob路径|无|
 |defaultConfig|指定接口的全局默认配置|GlobalRouteConfig|如下 GlobalRouteConfig 介绍|如下 GlobalRouteConfig 默认值|
+|requestLogCallback|每个请求完成后的回调函数，可用于获取请求信息、响应时间等信息|Function|有效的函数|无|
 
 <br/>
 
@@ -177,13 +178,25 @@ type RegisterOptions = {
 |---|---|---|---|---|
 |method|接口全局请求方法|string|有效的 http 请求方法|get|
 |cors|跨域配置|boolean \| CORS|true\|false\|跨域配置对象|false，不支持跨域|
-|originWhiteList|请求源域名白名单，不设置或为空数组则不做服务的访问源限制，否则只有白名单内的请求源域名才能访问|string[\]|可访问本服务的请求源域名的集合|[]|
+|originWhiteList|请求源域名白名单，支持正则匹配，不设置或为空数组则不做服务的访问源限制，否则只有白名单内的请求源域名才能访问|string[\]|可访问本服务的请求源域名的集合|[]|
 |contentType|content-type|string|合法的content-type值|无|
 |authValidate|权限校验函数|Koa 中间件函数|不设置或Koa中间件函数|无|
 |isAuthValidate|默认是否开启 authValidate 权限校验|boolean|true \| false|false|
 
 <br/>
 <br/>
+
+#### RequestLogCallbackFn
+```typescript
+type RequestLogCallbackFn = (info: {
+  path: string;             // 请求路径
+  method: string;           // 请求方法
+  startTime: number;        // 收到请求的时间戳
+  endTime: number;          // 请求处理完毕的时间戳
+  duration: number;         // 请求处理时间 ms
+  ctx: Context;             // Koa ctx
+}) => void;
+```
 
 ## 3.2 接口定义
 支持两种方式加载路由：
