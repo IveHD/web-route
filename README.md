@@ -178,6 +178,8 @@ type RegisterOptions = {
 * ts 注解方式：在类的方法上使用 @RequestMapping 注解，并向 @RequestMapping 传入配置对象。
 * js commonjs 方式：module.exports 导出接口配置的集合。
 
+<br/>
+
 ### 3.2.1 接口配置对象
 ```typescript
 type RouteConfig = {
@@ -193,7 +195,7 @@ type RouteConfig = {
 }
 ```
 
-### RouteConfig
+#### RouteConfig
 |属性|说明|类型|可选值|默认值|
 |---|---|---|---|---|
 |path|接口路径|string|任何路径|无|
@@ -202,11 +204,18 @@ type RouteConfig = {
 |originWhiteList|如全局和接口均未设置白名单则接口无限制，否则接口可访问请求源域名为全局设置+接口设置|string[\]|可访问本服务的请求源域名的集合|无或全局默认配置|
 |contentType|content-type|string|-|无或全局默认配置|
 |authValidate|权限校验函数，接口设置将覆盖全局设置|Koa 中间件函数|不设置或Koa中间件函数|无或全局设置|
-|isAuthValidate|默认是否开启 authValidate 权限校验|boolean|true \| false|false或全局设置|
-<!-- |paramValidate|参数校验配置|boolean|true \| false|false或全局设置| -->
-<!-- todo -->
+|isAuthValidate|是否开启 authValidate 权限校验|boolean|true \| false|false或全局设置|
+|paramValidate|参数校验配置|boolean|true \| false|无|
+|handler|接口处理逻辑函数或函数集合|function \| function[]|有效的函数逻|无|
+
+#### cors 跨域配置
 
 
+#### paramValidate 参数校验配置
+
+#### handler 接口处理逻辑
+
+### 3.2.2 ts 注解配置接口
 ```typescript
 import { RequestMapping, ValidParamRule } from "web-route";
 import { Context } from "koa";
@@ -225,14 +234,10 @@ class HiController {
 }
 ```
 
-```typescript
-declare const RequestMapping: (config: string | {
-    path: string;
-    method?: string | undefined;
-    contentType?: string | undefined;
-    cors?: boolean | { origin?: string, headers?: string, methods?: string, credentials?: string };
-}) => (...args: any[]) => void;
-```
+
+### 3.2.3 js commonjs 模块配置接口
+
+
 @RequestMapping 用于定义接口路由，有两种使用方式：<br/>
 #### 1. 修饰路由模块 class
   * 参数
