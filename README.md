@@ -180,7 +180,7 @@ type RegisterOptions = {
 |cors|跨域配置|boolean \| CORS|true\|false\|跨域配置对象|false，不支持跨域|
 |originWhiteList|请求源域名白名单，支持正则匹配，不设置或为空数组则不做服务的访问源限制，否则只有白名单内的请求源域名才能访问|string[\]|可访问本服务的请求源域名的集合|[]|
 |contentType|content-type|string|合法的content-type值|无|
-|authValidate|权限校验函数|Koa 中间件函数|不设置或Koa中间件函数|无|
+|authValidate|权限校验函数，支持异步函数|Koa 中间件函数|不设置或Koa中间件函数|无|
 |isAuthValidate|默认是否开启 authValidate 权限校验|boolean|true \| false|false|
 
 <br/>
@@ -286,9 +286,9 @@ type ParamValidateFn = { [name: string]: validFn | validFn[] };
 {
   // ...其他配置...
   paramValidate: {
-    param1: (name, value) => {
+    param1: async (name, value) => {
       // 验证逻辑
-      if ('校验成功') {
+      if ('异步校验成功') {
         return true;
       } else {
         return '失败提示';
@@ -318,6 +318,7 @@ type ParamValidateFn = { [name: string]: validFn | validFn[] };
 ```
 说明：
 * paramValidate 是一个对象，对象属性为参数名，对象值为校验函数或校验函数的集合(多个校验条件)。
+* 校验函数支持异步校验。
 * 校验函数可接收四个参数，分别是 参数名、参数值、所有请求参数、Koa 的 ctx。
 * 检验函数返回字符串将被认作校验不通过，且字符串将被作为校验不成功的提示，无返回值或返回值非字符串，则认为校验通过。
 web-route 内置了常用的参数校验函数，通过 ParamValidRule 对外暴露
