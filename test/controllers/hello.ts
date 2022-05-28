@@ -58,7 +58,7 @@ class HiController {
     };
   }
 
-  @RequestMapping({ path: '/originWhiteList', method: 'post', originWhiteList: ['http://127.0.0.1:8080'] })
+  @RequestMapping({ path: '/originWhiteList', method: 'post', originWhiteList: ['http://white.list.com'] })
   async fn5(ctx: Context) {
     ctx.body = {
       success: true,

@@ -1,6 +1,6 @@
 {
   "name": "web-route",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Use Typescript annotations to load API routes and easily configure APIs",
   "main": "dist/index.js",
   "scripts": {
@@ -12,21 +12,20 @@
   "author": "handong",
   "license": "ISC",
   "dependencies": {
+    "koa-router": "^10.1.1",
     "co-body": "^6.1.0",
     "copy-to": "^2.0.1",
     "glob": "^7.2.0",
-    "koa": "^2.13.3",
-    "node-web-mvc": "^2.13.5",
     "tslib": "^2.3.1"
   },
   "devDependencies": {
     "@types/koa": "^2.13.4",
     "@types/node": "^16.10.3",
     "axios": "^0.27.2",
-    "koa-router": "^10.1.1",
     "mocha": "^10.0.0",
     "ts-node": "^10.7.0",
-    "typescript": "^4.6.2"
+    "typescript": "^4.6.2",
+    "koa": "^2.13.3"
   },
   "directories": {
     "test": "test"

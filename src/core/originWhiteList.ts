@@ -22,7 +22,7 @@ export default (config: RouteConfig, addRoute: Function) => {
       path,
       method: 'options',
       handler: async (ctx, next) => {
-        if(!!regxs.find(r => r.test(ctx.origin))) {
+        if(!!regxs.find(r => r.test(ctx.get('origin')))) {
           ctx.response.status = 200;
           setCorsHeader(ctx, true);
         }
@@ -31,7 +31,7 @@ export default (config: RouteConfig, addRoute: Function) => {
   }
   
   return async (ctx: Context, next: Next) => {
-    if(!!regxs.find(r => r.test(ctx.origin))) {
+    if(!!regxs.find(r => r.test(ctx.get('origin')))) {
       // 如果接口没做跨域配置，则为 originWhiteList 里面的域名自动添加允许跨域，如果做了跨域配置，则使用配置
       if(!cors) {
         setCorsHeader(ctx, true);

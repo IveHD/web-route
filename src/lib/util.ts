@@ -8,3 +8,5 @@ export const lowerCaseTrim = (str: string): string => {
 export const transparentMiddleware = async (ctx, next) => {
   await next()
 };
+
+export const pathJoin = (...paths): string => '/' + paths.map(e => e.replace(/^\/|\/$/g, '')).join('/');;

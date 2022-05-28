@@ -67,7 +67,7 @@ module.exports = [{
 }, {
   path: '/js_api/originWhiteList',
   method: 'post',
-  originWhiteList: ['http://127.0.0.1:8080'],
+  originWhiteList: ['http://white.list.com'],
   handler(ctx, next) {
     ctx.body = {
       success: true,

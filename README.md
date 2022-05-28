@@ -53,7 +53,7 @@ const router = register({
     cors: true,
 
     // 请求源域名白名单
-    originWhiteList: ['http://127.0.0.1']
+    originWhiteList: ['http://127.0.0.1'],
 
     // 接口默认 content-type
     contentType: 'application/json;charset=utf-8',

@@ -1,6 +1,6 @@
 
 import RouteMapping from '../core/route';
-import { AnnotationRouteConfig } from 'src/types/global';
+import { AnnotationRouteConfig } from '../types/global';
 
 const RequestMapping = (config: string | AnnotationRouteConfig) => {
   let configObj: AnnotationRouteConfig = { path: '/' };

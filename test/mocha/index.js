@@ -1,12 +1,12 @@
 const axios = require('axios');
 const config = require('../registerConfig');
 
-const domain = 'http://127.0.0.1:8080';
+const domain = 'http://127.0.0.1:8082';
 
 describe('#接口注册', () => {
   const method = config.defaultConfig.method || 'get';
   it('#ts 注解默认注册接口', (done) => {
-    axios[method](`${domain}/ts_api/registByString`).then(res => {
+    axios[method](`${domain}/ts_api/registByString`, { headers: { oo: '123' } }).then(res => {
       if (res.data.success === true) done();
       else done(res.data);
     }).catch(err => {
@@ -41,7 +41,7 @@ describe('#接口注册', () => {
 
 describe('#参数校验', () => {
   it('#ts 参数不合格', (done) => {
-    axios.post(`${domain}/ts_api/paramValid`).then(res => {
+    axios.post(`${domain}/ts_api/paramValid`, {a: 10}).then(res => {
       if (res.data.success === false) done();
       else done(res.data);
     }).catch(err => {
@@ -250,7 +250,7 @@ describe('#访问源白名单', () => {
     });
   });
   it('#ts 权限通过', done => {
-    axios.post(`${domain}/ts_api/originWhiteList`, null).then(res => {
+    axios.post(`${domain}/ts_api/originWhiteList`, null, { headers: { origin: 'http://white.list.com' } }).then(res => {
       if (res.data.success) done();
       else done(res.data);
     }).catch(err => {
@@ -266,7 +266,7 @@ describe('#访问源白名单', () => {
     });
   });
   it('#js 权限通过', done => {
-    axios.post(`${domain}/js_api/originWhiteList`, null).then(res => {
+    axios.post(`${domain}/js_api/originWhiteList`, null, { headers: { origin: 'http://white.list.com' } }).then(res => {
       if (res.data.success) done();
       else done(res.data);
     }).catch(err => {

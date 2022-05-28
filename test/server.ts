@@ -6,7 +6,12 @@ const app = new Koa();
 
 const router = register(config);
 
+app.use(async (ctx, next) => {
+  console.log(ctx);
+  await next();
+});
+
 app.use(router.routes());
-app.listen(8080, () => {
+app.listen(8082, () => {
   console.log('启动。。。');
 });

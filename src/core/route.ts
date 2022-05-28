@@ -1,20 +1,19 @@
-import path from 'path';
 import { getConfig } from '../lib/config';
 import { GROUP_ROUTE, ROUTE, RouteConfig, CORS } from '../types/global';
-import { EXCEPTION_CODE, HTTP_METHOD } from '../lib/const';
-import corsMiddleware, { setCorsHeader } from './cors';
+import corsMiddleware from './cors';
 import contentType from './contentType';
 import paramValid from './paramValid';
 import { Middleware } from 'koa';
 import authValidate from './authValidate';
 import originWhiteList from './originWhiteList';
+import { pathJoin } from '../lib/util';
 
 const DEFAULT_CONFIG = getConfig();
 
 class Mapping {
-  map: Map<Function, GROUP_ROUTE> = new Map();
+  private map: Map<Function, GROUP_ROUTE> = new Map();
 
-  routes: ROUTE[] = [];
+  private routes: ROUTE[] = [];
 
   doAddAnnotationRoute(ctor: Function, route: ROUTE, toRear: boolean = true) {
     const r = this.map.get(ctor);
@@ -30,7 +29,7 @@ class Mapping {
 
   doAddRoute(route: ROUTE) {
     if (this.routes.find(r => r.path === route.path && r.method === route.method)) {
-      throw new Error(`duplicate interface: ${route.method}: ${route.path}`);
+      throw new Error(`duplicate route: ${route.method}: ${route.path}`);
     }
     this.routes.push(route);
   }
@@ -79,9 +78,9 @@ class Mapping {
     this.map.forEach((value, key) => {
       if (value.prefix === null) return;
       value.routes.forEach((e) => {
-        const url = path.join(value.prefix as string, e.path);
+        const url = pathJoin(value.prefix as string, e.path);
         if (data.find(r => r.path === url && r.method === e.method)) {
-          throw new Error(`duplicate interface: ${e.method}: ${url}`);
+          throw new Error(`duplicate route: ${e.method}: ${url}`);
         }
         data.push({
           path: url,
