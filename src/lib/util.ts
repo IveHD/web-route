@@ -9,4 +9,11 @@ export const transparentMiddleware = async (ctx, next) => {
   await next()
 };
 
-export const pathJoin = (...paths): string => '/' + paths.map(e => e.replace(/^\/|\/$/g, '')).join('/');;
+export const pathJoin = (...paths): string => {
+  const result = paths.map(e => e.replace(/^\/|\/$/g, '')).join('/')
+  if (result.startsWith('/')) {
+    return result;
+  } else {
+    return `/${result}`;
+  }
+};

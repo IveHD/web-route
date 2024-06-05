@@ -1,7 +1,7 @@
 import { RequestMapping, ParamValidRule, CONTENT_TYPE, NO_AUTH_BODY } from "../../src/index";
 import { Context } from "koa";
 
-@RequestMapping('/ts_api/')
+@RequestMapping('/')
 class HiController {
   @RequestMapping('/registByString')
   default(ctx) {
