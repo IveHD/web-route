@@ -7,6 +7,8 @@ import { Middleware } from 'koa';
 import authValidate from './authValidate';
 import originWhiteList from './originWhiteList';
 import { pathJoin } from '../lib/util';
+import BuildSwagger from './buildSwagger';
+const buildSwagger = new BuildSwagger();
 
 const DEFAULT_CONFIG = getConfig();
 
@@ -35,11 +37,11 @@ class Mapping {
   }
 
   addRoute(config: RouteConfig, ctor?: Function) {
-    let { path, method, handler, cors } = Object.assign({}, DEFAULT_CONFIG, config);
+    const newConfig = Object.assign({}, DEFAULT_CONFIG, config);
+    let { path, method, handler, cors } = newConfig;
     const addRoute = ctor ? this.doAddAnnotationRoute.bind(this, ctor) : this.doAddRoute.bind(this);
-
+    buildSwagger.addPath(newConfig);
     let middleware: Middleware[] = [];
-
     middleware.push(
       corsMiddleware(config, addRoute),
       originWhiteList(config, addRoute),
@@ -48,7 +50,7 @@ class Mapping {
       paramValid(config),
     );
 
-    if(typeof handler === 'function') middleware.push(handler);
+    if (typeof handler === 'function') middleware.push(handler);
     else if (Array.isArray(handler)) middleware.push(...handler);
 
     addRoute({

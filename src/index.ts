@@ -19,10 +19,10 @@ const parser = bodyParser({
 function register(options: RegisterOptions): KoaRouter {
   const { defaultConfig = {} } = options;
   setConfig({ ...defaultConfig });
-  
+
   let routeData: ROUTE[] = [];
   const { annControllerPath, controllerPath } = options;
-  
+
   // 利用注解的编译过程直接向 RouteMapping 添加路由配置
   if (annControllerPath) {
     const annList = glob.sync(options.annControllerPath);
@@ -30,10 +30,10 @@ function register(options: RegisterOptions): KoaRouter {
       require(p);
     });
   }
-  
+
   // 通过 commonjs module 获取路由配置并向 RouteMapping 添加路由配置
   if (controllerPath) {
-    const list =  glob.sync(options.controllerPath);
+    const list = glob.sync(options.controllerPath);
     list.forEach(p => {
       const controllers = require(p);
       if (!Array.isArray(controllers)) throw new Error(`it is not a standard controller module of: ${p}`);
@@ -44,7 +44,7 @@ function register(options: RegisterOptions): KoaRouter {
   }
 
   // 获取所有路由配置信息，并向 router 注册
-  Array.prototype.push.apply(routeData, getRouteData());  
+  Array.prototype.push.apply(routeData, getRouteData());
   routeData.forEach(r => {
     const handler = Array.isArray(r.handler) ? r.handler : [r.handler];
     router[r.method](r.path, ...handler);
@@ -58,7 +58,7 @@ function register(options: RegisterOptions): KoaRouter {
     await parser(ctx);
     const result = await routes(ctx, next);
     const endTime = Date.now();
-    if(typeof options.requestLogCallback === 'function') {
+    if (typeof options.requestLogCallback === 'function') {
       options.requestLogCallback({
         path: ctx.path,
         method: ctx.method,
@@ -69,8 +69,7 @@ function register(options: RegisterOptions): KoaRouter {
       });
     }
     return result;
-  };;
-  
+  };
   return router;
 }
 

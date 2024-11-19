@@ -5,7 +5,10 @@ export type CORS = boolean | CORS_CONFIG;
 export type Handler = (ctx: Context, next: Next) => void | Promise<void>;
 export type Handlers = Handler[];
 export type AuthValidateFn = Middleware;
-export type validFn = (paramName: string, paramValue: any, requestBody?: Record<string, any>, ctx?: Context) => string | boolean | Promise<string> | Promise<boolean>;
+export type validFn = {
+  (paramName: string, paramValue: any, requestBody?: Record<string, any>, ctx?: Context): string | boolean | Promise<string> | Promise<boolean>;
+  type?: string;
+};
 export type ParamValidateFn = { [name: string]: validFn | validFn[] };
 
 export type RouteConfig = {
@@ -22,12 +25,12 @@ export type RouteConfig = {
 
 
 // 注解方式可配置的 config
-export  type AnnotationRouteConfig = Omit<RouteConfig, 'handler'>;
+export type AnnotationRouteConfig = Omit<RouteConfig, 'handler'>;
 
 export type GlobalRouteConfig = Omit<RouteConfig, 'handler' | 'path' | 'paramValidate'>;
 
-export  type ROUTE = Pick<RouteConfig, 'path' | 'method' | 'handler'>;
-export  type GROUP_ROUTE = {
+export type ROUTE = Pick<RouteConfig, 'path' | 'method' | 'handler'>;
+export type GROUP_ROUTE = {
   prefix: string | null;
   routes: Array<ROUTE>
 };
@@ -41,7 +44,7 @@ export type RequestLogCallbackFn = (info: {
   ctx: Context;
 }) => void;
 
-export type RegisterOptions = { 
+export type RegisterOptions = {
   annControllerPath?: string,                 // 注解方式编译时加载路由的模块 glob 路径
   controllerPath?: string;                    // commonjs 运行时方式加载路由的模块 glob 路径
   defaultConfig?: GlobalRouteConfig,          // 指定接口的全局默认配置

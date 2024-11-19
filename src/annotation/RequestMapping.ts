@@ -7,7 +7,7 @@ const RequestMapping = (config: string | AnnotationRouteConfig) => {
   if (typeof config === 'string') {
     configObj.path = config;
   } else {
-    configObj = { ... config };
+    configObj = { ...config };
   }
   return (...args) => {
     const [target, property] = args;
