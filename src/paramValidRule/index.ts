@@ -1,4 +1,4 @@
-export const REUQIRED = (name, value) => (value === undefined || value === '' || value === null) && `[${name}]值不能为空`
+export const REQUIRED = (name, value) => (value === undefined || value === '' || value === null) && `[${name}]值不能为空`
 export const STRING = (name, value) => typeof value === 'string' || `[${name}]值应为字符串`;
 export const NUMBER = (name, value) => typeof value === 'number' || `[${name}]值应为数字`;
 export const EMAIL = (name, value) => typeof value === 'string' && /^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/.test(value) || `[${name}]值应为邮件地址`;
@@ -12,7 +12,7 @@ export const NO_SPACE = (name, value) => typeof value === 'string' && !/[\n\s*\r
 export const NO_SPECIAL_CHAR = (name, value) => typeof value === 'string' && /^[\u4e00-\u9fa5a-zA-Z0-9_]*$/.test(value) || `[${name}]值应为中文、英文、数字、下划线组成;`;
 
 export default {
-  REUQIRED,
+  REQUIRED,
   STRING,
   NUMBER,
   EMAIL,
