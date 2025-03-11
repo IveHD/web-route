@@ -1,6 +1,6 @@
 {
   "name": "web-route",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Use Typescript annotations to load API routes and easily configure APIs",
   "main": "dist/index.js",
   "scripts": {

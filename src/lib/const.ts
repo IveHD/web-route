@@ -27,6 +27,7 @@ export const CONTENT_TYPE = {
   "APPLICATION_FORM": "application/x-www-form-urlencoded",
   "APPLICATION_JSON_UTF8": "application/json;charset=utf-8",
   "APPLICATION_FORM_UTF8": "application/x-www-form-urlencoded;charset=utf-8",
+  "EVENT_STREAM": "text/event-stream"
 };
 
 export const EXCEPTION_CODE = {
