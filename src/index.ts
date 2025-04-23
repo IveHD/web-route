@@ -25,7 +25,7 @@ function register(options: RegisterOptions): KoaRouter {
 
   // 利用注解的编译过程直接向 RouteMapping 添加路由配置
   if (annControllerPath) {
-    const annList = glob.sync(options.annControllerPath);
+    const annList = glob.sync(options.annControllerPath, { ignore: ['node_modules/**', '**/*.d.ts'] });
     annList.forEach(p => {
       require(p);
     });
@@ -33,7 +33,7 @@ function register(options: RegisterOptions): KoaRouter {
 
   // 通过 commonjs module 获取路由配置并向 RouteMapping 添加路由配置
   if (controllerPath) {
-    const list = glob.sync(options.controllerPath);
+    const list = glob.sync(options.controllerPath, { ignore: ['node_modules/**', '**/*.d.ts'] });
     list.forEach(p => {
       const controllers = require(p);
       if (!Array.isArray(controllers)) throw new Error(`it is not a standard controller module of: ${p}`);

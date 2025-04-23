@@ -1,3 +1,7 @@
+# 20250423 1.0.5
+
+- 修复：glob 路径匹配时忽略 node_modules 和 .d.ts
+
 # 20240605 1.0.4
 
 - 修复：content-type 校验支持 text/event-stream
