@@ -10,6 +10,29 @@ export const ID_CARD_NUMBER = (name, value) => typeof value === 'string' && /(^\
 export const CN = (name, value) => typeof value === 'string' && /[\u4e00-\u9fa5]/.test(value) || `[${name}]值应为中文;`;
 export const NO_SPACE = (name, value) => typeof value === 'string' && !/[\n\s*\r]/.test(value) || `[${name}]值不能包含空格;`;
 export const NO_SPECIAL_CHAR = (name, value) => typeof value === 'string' && /^[\u4e00-\u9fa5a-zA-Z0-9_]*$/.test(value) || `[${name}]值应为中文、英文、数字、下划线组成;`;
+export const ARRAY = (name: string, value: any) => {
+  return Array.isArray(value) ? true : `${name} 必须是数组`;
+};
+
+export const ARRAY_OF_STRING = (name: string, value: any) => {
+  return Array.isArray(value) && value.every((item: any) => typeof item === 'string') ? true : `${name} 必须是字符串数组`;
+};
+
+export const ARRAY_OF_STRING_NOT_EMPTY = (name: string, value: any) => {
+  return Array.isArray(value) && value.every((item: any) => typeof item === 'string') && value.length > 0 ? true : `${name} 必须是字符串数组`;
+};
+
+export const ARRAY_OF_NUMBER = (name: string, value: any) => {
+  return Array.isArray(value) && value.every((item: any) => typeof item === 'number') ? true : `${name} 必须是数字数组`;
+};
+
+export const ARRAY_OF_NUMBER_NOT_EMPTY = (name: string, value: any) => {
+  return Array.isArray(value) && value.every((item: any) => typeof item === 'number') && value.length > 0 ? true : `${name} 必须是数字数组`;
+};
+
+export const OBJECT = (name: string, value: any) => {
+  return typeof value === 'object' && value !== null ? true : `${name} 必须是对象`;
+};
 
 export default {
   REQUIRED,
@@ -24,4 +47,10 @@ export default {
   CN,
   NO_SPACE,
   NO_SPECIAL_CHAR,
+  ARRAY,
+  ARRAY_OF_STRING,
+  ARRAY_OF_STRING_NOT_EMPTY,
+  ARRAY_OF_NUMBER,
+  ARRAY_OF_NUMBER_NOT_EMPTY,
+  OBJECT,
 };

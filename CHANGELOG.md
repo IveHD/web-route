@@ -1,3 +1,7 @@
+# 20250511 1.0.6
+
+- 优化：新增 ARRAY、ARRAY_OF_NUMBER、ARRAY_OF_NUMBER_NOT_EMPTY、OBJECT 校验规则
+
 # 20250423 1.0.5
 
 - 修复：glob 路径匹配时忽略 node_modules 和 .d.ts
