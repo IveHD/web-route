@@ -11,7 +11,7 @@ const corsDefaultHeader = {
 export const setCorsHeader = (ctx: Context, config: CORS) => {
   let origin, headers, methods, credentials;
   if (config === true) {
-    origin = corsDefaultHeader.origin;
+    origin = ctx.get('origin');
     headers = corsDefaultHeader.headers;
     methods = ctx.request.method;
     credentials = (corsDefaultHeader.credentials) as unknown as string;
@@ -25,14 +25,14 @@ export const setCorsHeader = (ctx: Context, config: CORS) => {
   ctx.set('Access-Control-Allow-Headers', headers);
   ctx.set('Access-Control-Allow-Methods', methods);
   ctx.set('Access-Control-Allow-Credentials', credentials);
-  if(origin !== '*') {
+  if (origin !== '*') {
     ctx.set('Vary', 'Origin');
   }
 }
 
 export default function corsMiddleware(config: RouteConfig, addRoute: Function): Middleware {
   const { path, cors } = config;
-  if(cors) {
+  if (cors) {
     // 跨域预检请求
     addRoute({
       path,
@@ -44,7 +44,7 @@ export default function corsMiddleware(config: RouteConfig, addRoute: Function):
     });
   }
   return async (ctx: Context, next: Next) => {
-    if(cors) {
+    if (cors) {
       setCorsHeader(ctx, cors);
     }
     await next();
